@@ -92,6 +92,7 @@ This repository is a research playground — not a product — for experimenting
 
 
 
+_Local sync test: working on prototype phase_
 
 
 
