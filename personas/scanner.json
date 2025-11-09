@@ -1,0 +1,14 @@
+{
+  "name": "scanner",
+  "description": "For aggressive scanning tools (nmap, dirbuster, sqlmap).",
+  "fake_services": ["FTP", "SMTP"],
+  "banners": {
+    "FTP": "220 ProFTPD 1.3.5a Server ready.",
+    "SMTP": "220 Microsoft ESMTP MAIL Service ready at Tue, 9 Nov 2025 12:00:00 -0500"
+  },
+  "breadcrumbs": [
+    "/dev",
+    "/debug",
+    "/config/old.conf"
+  ]
+}
