@@ -1,43 +1,28 @@
 # SynAccel Mirage v2  
-### Adaptive Cognitive Deception for Real-Time Misdirection  
+### Adaptive Deception Framework — Behavioral Honeypot Core
 
-**SynAccel Mirage v2** is an experimental deception framework that builds *personalized illusions* for every attacker.  
-Instead of blocking scans, Mirage listens, learns, and reflects a fake reality that evolves with the intruder’s behavior.
-
----
-
-## Concept
-
-When a probe or scan hits your system, Mirage acts as a **behavioral mirror**:
-
-1. **Detects** reconnaissance patterns (e.g., nmap, dirbuster, burp).  
-2. **Profiles** the intruder’s style and assigns them a unique persona.  
-3. **Generates** a believable decoy environment — fake ports, banners, credentials, and data trails.  
-4. **Responds** dynamically so that each attacker experiences a different “truth.”  
-5. **Logs** their perceived world, turning psychology into telemetry.
-
-Mirage is less about *hiding* and more about *storytelling* — crafting a world convincing enough that an attacker gets lost inside it.
+**Mirage v2** is the adaptive brain of the SynAccel Cyber ecosystem.  
+It simulates *psychological deception environments* — generating believable fake banners, service responses, and persona-driven worlds that adapt based on attacker behavior.
 
 ---
 
-## Why It Matters
-
-Traditional honeypots show the same façade to everyone.  
-**Mirage learns who’s looking and rewrites reality accordingly.**  
-
-It bridges cybersecurity, behavioral science, and adaptive AI — exploring how machines can *shape attacker perception* in real time.
+## Current Capabilities (v2 Core)
+**Core Systems:**
+- **Detection Layer:** Identifies incoming probes, extracts IP and User-Agent data, and flags suspicious scanners.
+- **Response Engine:** Generates believable fake banners (SSH, HTTP, FTP, SMTP) for each request.
+- **Telemetry System:** Records every interaction to structured logs (`logs/perception_log.jsonl`) for behavioral analysis.
+- **Persona Engine:** Loads configurable “personas” from JSON templates (default, opportunist, scanner) and serves matching illusions.
+- **Automatic Persona Assignment:** Detects reconnaissance tools (e.g., nmap, sqlmap) and responds with tailored persona environments.
 
 ---
 
-## Core Components
+## Project Vision
+**Goal:**  
+Transform Mirage from a static honeypot into an *adaptive organism* — a system that:
+- Evolves deception dynamically per attacker.
+- Generates unique “worlds” per IP or behavior profile.
+- Can eventually integrate with **SynAccel Bridge** for real multi-port, network-level illusions.
 
-| Layer | Purpose |
-|-------|----------|
-| Detection | Identify probes, scans, or suspicious traffic patterns. |
-| Persona Engine | Build individualized decoy worlds using JSON templates and generative text. |
-| Response Layer | Serve dynamic banners, pages, and files without exposing the real system. |
-| Telemetry Core | Log what attackers *believe* exists (their “perception map”). |
-| Adaptive Loop | (Future) Learn which illusions work best and evolve automatically. |
 
 ---
 
@@ -72,8 +57,7 @@ It bridges cybersecurity, behavioral science, and adaptive AI — exploring how 
 - [ ] Serve unique fake service banners per attacker.  
 - [ ] Generate decoy HTML login pages dynamically.  
 - [ ] Log all requests to a `perception_log.jsonl`.  
-- [ ] (Later) Visualize attacker belief map with Streamlit.  
-
+  
 ---
 
 ##  Vision
@@ -85,6 +69,12 @@ SynAccel Mirage v2 is part of a broader SynAccel Cyber initiative exploring adap
 This repository is a research playground — not a product — for experimenting with perception as a defensive surface.
 
 ---
+
+## Usage
+
+```
+uvicorn src.server:app --reload
+```
 
 **Status:** Concept Prototype (R&D)  
 **License:** MIT  
