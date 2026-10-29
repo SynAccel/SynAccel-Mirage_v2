@@ -1,47 +1,49 @@
-from fastapi import FastAPI, Request
-from src.detection import detect_probe
-from src.response_engine import send_fake_banner
-from src.telemetry import log_event
-from src.persona_engine import load_persona
-from fastapi.responses import PlainTextResponse
+import logging
 
-app = FastAPI()
+from fastapi import FastAPI, HTTPException, Request
+
+from src.detection import detect_probe, select_persona
+from src.persona_engine import load_persona
+from src.response_engine import select_fake_banner, send_fake_banner
+from src.telemetry import log_event
+
+logger = logging.getLogger(__name__)
+app = FastAPI(title="SynAccel Mirage", version="2.1.0")
+
 
 @app.get("/")
 async def home():
-    return {"message": "SynAccel Mirage v2 operational."}
+    return {"name": "SynAccel Mirage", "status": "operational", "version": app.version}
+
+
+@app.get("/healthz")
+async def health_check():
+    return {"status": "ok"}
+
 
 @app.get("/banner")
-async def banner_endpoint(request: Request):
+async def banner_endpoint(request: Request, service: str | None = None):
     probe_data = await detect_probe(request)
-
-    # Persona decision logic
-    user_agent = probe_data["user_agent"].lower()
-    if any(term in user_agent for term in ["nmap", "sqlmap", "dirbuster", "masscan"]):
-        persona_name = "scanner"
-    elif "mozilla" in user_agent or "chrome" in user_agent:
-        persona_name = "opportunist"
-    else:
-        persona_name = "default"
-
+    persona_name = select_persona(probe_data["user_agent"])
     persona = load_persona(persona_name)
+    try:
+        service_type, banner_text = select_fake_banner(persona, service)
+    except ValueError as error:
+        raise HTTPException(status_code=404, detail="Service is not available for this persona") from error
 
-    # Pick one service type from persona
-    service_type = persona["fake_services"][0]
-    banner_text = persona["banners"][service_type]
-
-    fake_banner = PlainTextResponse(content=banner_text)
-
-    # Log event
     event = {
         "ip": probe_data["ip"],
         "user_agent": probe_data["user_agent"],
         "suspicious": probe_data["suspicious"],
         "persona": persona_name,
+        "service": service_type,
         "banner_sent": banner_text
     }
-    await log_event(event)
+    try:
+        await log_event(event)
+    except OSError:
+        logger.exception("Unable to persist interaction telemetry")
 
-    print(f"[MIRAGE] {probe_data['ip']} assigned persona '{persona_name}'")
-    return fake_banner
+    logger.info("Assigned persona %s and service %s", persona_name, service_type)
+    return send_fake_banner(banner_text)
 

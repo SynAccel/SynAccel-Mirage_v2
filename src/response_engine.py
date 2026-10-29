@@ -1,18 +1,24 @@
-from fastapi.responses import PlainTextResponse
 import random
+from typing import Any
 
-# a simple list of service banners
-FAKE_BANNERS = [
-     "SSH-2.0-OpenSSH_8.4p1 Debian-5",
-    "220 ProFTPD 1.3.5a Server ready.",
-    "HTTP/1.1 200 OK\nServer: Apache/2.4.51 (Ubuntu)\nContent-Type: text/html; charset=UTF-8",
-    "220 Microsoft ESMTP MAIL Service ready at Tue, 9 Nov 2025 12:00:00 -0500"
-]
 
-def generate_fake_banner():
-    """Pick a random banner from list to act as Mirage's illusion"""
-    return random.choice(FAKE_BANNERS)
+def select_fake_banner(persona: dict[str, Any], service: str | None = None) -> tuple[str, str]:
+    """Return a service and its configured banner, choosing randomly by default."""
+    services = persona["fake_services"]
+    selected_service = service.upper() if service else random.choice(services)
+    if selected_service not in services:
+        raise ValueError(f"Service is not available for this persona: {selected_service}")
+    return selected_service, persona["banners"][selected_service]
 
-async def send_fake_banner():
-    banner = generate_fake_banner()
-    return PlainTextResponse(content=banner)
+
+def send_fake_banner(banner: str):
+    """Build a non-cacheable plain-text decoy response."""
+    from fastapi.responses import PlainTextResponse
+
+    return PlainTextResponse(
+        content=banner,
+        headers={
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )

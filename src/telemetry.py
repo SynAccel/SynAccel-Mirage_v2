@@ -1,17 +1,24 @@
+import asyncio
 import json
-from datetime import datetime
+import os
+import threading
+from datetime import datetime, timezone
 from pathlib import Path
 
-LOG_FILE = Path("logs/perception_log.jsonl")
+BASE_DIR = Path(__file__).resolve().parent.parent
+LOG_FILE = Path(os.environ.get("MIRAGE_LOG_FILE", str(BASE_DIR / "logs/perception_log.jsonl")))
+_WRITE_LOCK = threading.Lock()
+
+
+def _append_event(event_data: dict) -> None:
+    LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+    line = json.dumps(event_data, ensure_ascii=True) + "\n"
+    with _WRITE_LOCK, LOG_FILE.open("a", encoding="utf-8") as log_file:
+        log_file.write(line)
+
 
 async def log_event(event_data: dict):
-    """
-    Save an interaction (probe + Mirage response) to the perception log.
-    """
-    # Add a timestamp
-    event_data["timestamp"] = datetime.utcnow().isoformat()
-
-    # Convert to JSON line and append to file
-    with open(LOG_FILE, "a", encoding="utf-8") as f:
-        json.dump(event_data, f)
-        f.write("\n")
+    """Append a timestamped interaction without blocking the event loop."""
+    record = dict(event_data)
+    record["timestamp"] = datetime.now(timezone.utc).isoformat()
+    await asyncio.to_thread(_append_event, record)

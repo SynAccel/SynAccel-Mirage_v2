@@ -1,0 +1,10 @@
+{
+	"name": "researcher",
+	"description": "A small service profile for recognizable research tooling.",
+	"fake_services": ["HTTP", "SSH"],
+	"banners": {
+		"HTTP": "HTTP/1.1 200 OK\nServer: nginx/1.24.0\nContent-Type: text/html; charset=UTF-8",
+		"SSH": "SSH-2.0-OpenSSH_9.3p2 Ubuntu-1ubuntu3"
+	},
+	"breadcrumbs": ["/robots.txt", "/security.txt", "/docs"]
+}

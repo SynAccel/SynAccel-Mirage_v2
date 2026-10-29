@@ -1,0 +1,10 @@
+{
+	"name": "targeted",
+	"description": "A consistent decoy profile for explicitly classified repeat activity.",
+	"fake_services": ["HTTP", "FTP"],
+	"banners": {
+		"HTTP": "HTTP/1.1 200 OK\nServer: nginx/1.22.1\nContent-Type: text/html; charset=UTF-8",
+		"FTP": "220 vsFTPd 3.0.3 ready."
+	},
+	"breadcrumbs": ["/admin", "/backup", "/status"]
+}
